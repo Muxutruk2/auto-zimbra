@@ -24,23 +24,27 @@ This repository contains a Bash script for automating the installation and initi
 ## Installation
 
 1. **Clone the repository**:
+
    ```bash
    git clone https://github.com/Muxutruk2/zimbra-installer
    cd zimbra-installer
    ```
 
 2. **Make the script executable**:
+
    ```bash
    chmod +x install.sh
    ```
 
 3. **Run the script as root**:
+
    ```bash
    sudo ./install.sh
    ```
 
 4. **Follow the prompts**:
    The script will ask for:
+
    - Static IP address for the Zimbra server.
    - FQDN for Zimbra and Windows servers.
    - Network interface name.
@@ -72,6 +76,9 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 **Disclaimer:** This script is provided as-is. Use it at your own risk. Always back up your data before making major changes to your server.
+<<<<<<< HEAD
 
 **Note:** This script has been tested and is intended to work with Ubuntu 20.04. Compatibility with other versions is not guaranteed.
 
+=======
+>>>>>>> c4ebf54 (Fixed README)
