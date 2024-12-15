@@ -19,15 +19,25 @@ prompt() {
 }
 
 # Gather user inputs
-prompt IP_ADDRESS "Enter the desired static IP address (e.g., 192.168.1.100)"
-prompt DNS_SERVERS "Enter the DNS servers (comma-separated, e.g., 8.8.8.8,8.8.4.4)"
-prompt DEFAULT_ROUTE "Enter the default route (e.g., 192.168.1.1)"
+# ZIMBRA
+prompt ZIMBRA_IP "Enter the desired static IP address for ZIMBRA (e.g., 192.168.1.100)"
+prompt ZIMBRA_FQDN "Enter the installation URL (e.g., mail.example.com)"
+ZIMBRA_HOST=${ZIMBRA_FQDN%%.*}
+
+# WINDOWS
+prompt WINDWOS_IP "Enter the IP address for WINDOWS (e.g., 192.168.1.100)"
+prompt WINDWOS_FQDN "Enter the FQDN for WINDOWS (e.g., WinServer.example.com)"
+WINDOWS_HOST=${WINDOWS_FQDN%%.*}
+
+# STATIC IP
 prompt INTERFACE "Enter the network interface (e.g., eth0)"
-prompt HOSTNAME "Enter the desired hostname for Zimbra"
-prompt INSTALL_URL "Enter the installation URL (e.g., mail.example.com)"
+prompt DEFAULT_ROUTE "Enter the default route (e.g., 192.168.1.1)"
+
+# MISC
+prompt TIMEZONE "Enter the timezone (e.g Europe/Madrid"
 
 # Step 1: Configure netplan
-NETPLAN_FILE="/etc/netplan/01-netcfg.yaml"
+NETPLAN_FILE="/etc/netplan/00-netcfg.yaml"
 echo "Creating netplan configuration at $NETPLAN_FILE..."
 cat <<EOF >"$NETPLAN_FILE"
 network:
@@ -37,12 +47,12 @@ network:
     $INTERFACE:
       dhcp4: false
       addresses:
-        - $IP_ADDRESS/24
+        - $ZIMBRA_IP/24
       routes: 
         - to: default
           via: $DEFAULT_ROUTE
       nameservers:
-        addresses: [$DNS_SERVERS]
+        addresses: [$WINDOWS_IP]
 EOF
 
 # Apply netplan configuration
@@ -59,12 +69,15 @@ systemctl stop apparmor
 systemctl disable apparmor
 
 # Step 5: Change hostname
-echo "$INSTALL_URL" >/etc/hostname
-hostnamectl set-hostname "$INSTALL_URL"
+echo "$ZIMBRA_FQDN" >/etc/hostname
+hostnamectl set-hostname "$ZIMBRA_FQDN"
 
 # Step 6: Let the user edit /etc/hosts
-cat <<EOF
-$IP_ADDRESS $INSTALL_URL $HOSTNAME
+cat <<EOF >"/etc/hosts"
+127.0.0.1 localhost
+127.0.1.1 $ZIMBRA_FQDN $ZIMBRA_HOST
+$ZIMBRA_IP $ZIMBRA_FQDN $ZIMBRA_HOST
+$WINDOWS_IP $WINDOWS_FQDN $WINDOWS_HOST
 EOF
 $EDITOR /etc/hosts
 
@@ -72,16 +85,14 @@ $EDITOR /etc/hosts
 systemctl disable systemd-resolved
 systemctl stop systemd-resolved
 rm -f /etc/resolv.conf
-cat <<EOF
-Edit /etc/resolv.conf and add your desired DNS servers. Example:
-nameserver 8.8.8.8
-nameserver 8.8.4.4
+cat <<EOF >"/etc/resolv.conf"
+nameserver $WINDOWS_IP
 EOF
 $EDITOR /etc/resolv.conf
 
 # Step 8: Install Zimbra
 echo "Downloading Zimbra..."
-wget https://files.zimbra.com/downloads/10.0.0_GA/zimbra.tar.gz -O /tmp/zimbra.tar.gz
+wget https://files.zimbra.com/downloads/8.8.15_GA/zcs-8.8.15_GA_4179.UBUNTU20_64.20211118033954.tgz -O /tmp/zimbra.tar.gz
 
 echo "Extracting Zimbra installer..."
 tar -xvzf /tmp/zimbra.tar.gz -C /tmp
