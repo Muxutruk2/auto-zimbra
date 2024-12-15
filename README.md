@@ -26,8 +26,8 @@ This repository contains a Bash script for automating the installation and initi
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/Muxutruk2/zimbra-installer
-   cd zimbra-installer
+   git clone https://github.com/Muxutruk2/auto-zimbra
+   cd auto-zimbra
    ```
 
 2. **Make the script executable**:
