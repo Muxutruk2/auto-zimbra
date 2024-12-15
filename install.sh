@@ -34,7 +34,7 @@ prompt INTERFACE "Enter the network interface (e.g., eth0)"
 prompt DEFAULT_ROUTE "Enter the default route (e.g., 192.168.1.1)"
 
 # MISC
-prompt TIMEZONE "Enter the timezone (e.g Europe/Madrid"
+prompt TIMEZONE "Enter the timezone (e.g., Europe/Madrid)"
 
 # Step 1: Configure netplan
 NETPLAN_FILE="/etc/netplan/00-netcfg.yaml"
