@@ -76,9 +76,5 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 ---
 
 **Disclaimer:** This script is provided as-is. Use it at your own risk. Always back up your data before making major changes to your server.
-<<<<<<< HEAD
 
 **Note:** This script has been tested and is intended to work with Ubuntu 20.04. Compatibility with other versions is not guaranteed.
-
-=======
->>>>>>> c4ebf54 (Fixed README)
