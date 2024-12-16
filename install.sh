@@ -15,7 +15,8 @@ if [ "$#" -eq 1 ] && [ -f "$1" ]; then
   source "$1"
 else
   read -rp "Enter the desired text editor (e.g., vim, nano" EDITOR
-  # Prompt user for inputs if no file is provided
+
+  read -rp "Enter the network's PUBLIC IP address (e.g., 2.162.4.120): " PUBLIC_IP
   read -rp "Enter the desired static IP address for ZIMBRA (e.g., 192.168.1.100): " ZIMBRA_IP
   read -rp "Enter the installation URL (e.g., mail.example.com): " ZIMBRA_FQDN
 
@@ -26,6 +27,7 @@ else
   read -rp "Enter the default route (e.g., 192.168.1.1): " DEFAULT_ROUTE
 fi
 ZIMBRA_HOST=${ZIMBRA_FQDN%%.*}
+ZIMBRA_DOMAIN=$(echo "$ZIMBRA_FQDN" | awk -F. '{print $(NF-1)"."$NF}')
 WINDOWS_HOST=${WINDOWS_FQDN%%.*}
 
 # Step 1: Configure netplan
@@ -72,8 +74,8 @@ if ! systemctl stop apparmor || ! systemctl disable apparmor; then
 fi
 
 # Step 5: Change hostname
-echo "$ZIMBRA_FQDN" >/etc/hostname
-if ! hostnamectl set-hostname "$ZIMBRA_FQDN"; then
+echo "$ZIMBRA_DOMAIN" >/etc/hostname
+if ! hostnamectl set-hostname "$ZIMBRA_DOMAIN"; then
   echo "Error setting hostname. Reverting changes..."
   echo "localhost" >/etc/hostname
   exit 1
@@ -85,6 +87,7 @@ cat <<EOF >"/etc/hosts"
 127.0.0.1 localhost
 127.0.1.1 $ZIMBRA_FQDN $ZIMBRA_HOST
 $ZIMBRA_IP $ZIMBRA_FQDN $ZIMBRA_HOST
+$PUBLIC_IP $ZIMBRA_FQDN $ZIMBRA_HOST
 $WINDOWS_IP $WINDOWS_FQDN $WINDOWS_HOST
 EOF
 $EDITOR /etc/hosts
